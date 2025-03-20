@@ -4,12 +4,14 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        
+
         <title>{% block title %}{% endblock %}Ling blog</title>
 
         <link rel="stylesheet" href="https://unpkg.com/bulma@0.9.2/css/bulma.min.css">
         <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
-
+        <!-- 引入 Pygments 样式表 -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/13.0.1/markdown-it.min.js"></script>
         <style>
             /* 导航栏样式 */
             nav.navbar {
@@ -43,26 +45,34 @@
                         <span></span>
                     </span>
                 </div>
-
+        
                 <div id="navbarMenu" class="navbar-menu">
                     <div class="navbar-end">
                         <div class="navbar-item">
-                            <form method="get" action="{% url 'search' %}">
+                            <!-- 添加form标签，指定提交的地址和方法 -->
+                            <form action="{% url 'search' %}" method="GET">
                                 <div class="control has-icons-left">
-                                    <input class="input is-rounded" name="query" type="text" placeholder="Search">
+                                    <input class="input is-rounded" name="query" type="text" placeholder="Search" value="{{ query }}">
                                     <span class="icon is-left">
                                         <i class="fa fa-search"></i>
                                     </span>
                                 </div>
+                                <!-- 可添加隐藏的提交按钮（可选） -->
+                                <button type="submit" style="display: none;"></button>
                             </form>
                         </div>
-
+        
                         <a href="/" class="navbar-item is-active is-size-5 has-text-weight-semibold">
                             Home
                         </a>
                         <a href="{% url 'about' %}" class="navbar-item is-size-5 has-text-weight-semibold">
                             About
                         </a>
+                        {% if request.user.is_staff %}
+                            <a href="{% url 'add_post' %}" class="navbar-item is-size-5 has-text-weight-semibold">
+                                Add Post
+                            </a>
+                        {% endif %}
                     </div>
                 </div>
             </div>

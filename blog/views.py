@@ -1,12 +1,17 @@
 from django.shortcuts import redirect, render, get_object_or_404
 from .models import Post,Category
-from .forms import CommentForm
+from .forms import CommentForm, PostForm
 from django.db.models import Q
+from django.contrib import messages
+import markdown
+from django.contrib.auth.decorators import user_passes_test
 
-def detail(request, category_slug,slug):
+def detail(request,category_slug ,slug):
     # 获取文章对象，如果不存在则返回 404
     post = get_object_or_404(Post, slug=slug)
 
+    # 将文章的 body 字段从 Markdown 转换为 HTML
+    post.body = markdown.markdown(post.body, extensions=['codehilite','fenced_code'])
     # 处理表单提交
     if request.method == 'POST':
         form = CommentForm(request.POST)
@@ -24,8 +29,28 @@ def detail(request, category_slug,slug):
         form = CommentForm()
 
     # 渲染模板并传递上下文数据
-    return render(request, 'blog/detail.html', {'post': post,'form':form})
+    return render(request, 'blog/detail.html', {'post': post, 'form': form})
 
+
+
+
+@user_passes_test(lambda u: u.is_staff)
+def add_post(request):
+    if request.method == 'POST':
+        form = PostForm(request.POST, request.FILES)
+        if form.is_valid():
+            new_post = form.save(commit=False)
+            new_post.author = request.user
+            new_post.save()
+            return redirect('frontpage')
+    else:
+        form = PostForm(initial={'status': 'draft'})  # 初始化状态
+    
+    return render(request, 'blog/add_post.html', {
+        'form': form,
+        'categories': Category.objects.all()
+    })
+    
 
 def category(request,slug):
     category = get_object_or_404(Category,slug=slug)

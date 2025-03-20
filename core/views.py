@@ -1,10 +1,11 @@
-from blog.models import Post
+from blog.models import Post,Category
 from django.shortcuts import render 
 from django.http import HttpResponse
 def frontpage(request):
+    categorys = Category.objects.filter()
     posts = Post.objects.filter(status=Post.ACTIVE)
-
-    return render(request,'core/frontpage.html',{'posts':posts})
+    print(categorys)
+    return render(request,'core/frontpage.html',{'posts':posts,'categorys':categorys})
 
 def about(request):
     return render(request,'core/about.html')

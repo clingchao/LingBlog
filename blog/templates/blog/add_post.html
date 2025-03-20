@@ -1,0 +1,121 @@
+{% extends 'core/base.html' %}
+
+{% block title %}创建文章 | {% endblock %}
+
+{% block content %}
+<style>
+/* 自定义样式部分 */
+.borderless-textarea {
+    border: none !important;      /* 移除边框 */
+    box-shadow: 0 2px 3px rgba(10,10,10,0.1); /* 添加柔和阴影 */
+    transition: all 0.3s ease;   /* 过渡动画 */
+}
+
+.elegant-border {
+    border: 1px solid #48c774 !important;  /* 使用主题色边框 */
+    border-radius: 8px;           /* 更大的圆角 */
+    padding: 1.5rem;              /* 增加内边距 */
+}
+
+.preview-box {
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 1.5rem; 
+    min-height: 500px;           /* 保持与输入框同高 */
+}
+</style>
+<section class="hero">
+    <form method="post">
+    {% csrf_token %}
+    <div class="columns is-vcentered"> <!-- 新增垂直居中对齐 -->
+        <div class="column is-4">
+          <label class="label">标题</label>
+          <div class="control">
+            <input class="input" type="text" name="title" placeholder="文章标题">
+          </div>
+        </div>
+        
+        <div class="column is-4">
+          <label class="label">Slug</label>
+          <div class="control">
+            <input class="input" type="text" name="slug" placeholder="文章 Slug">
+          </div>
+        </div>
+      
+        <div class="column is-4">
+          <!-- 添加空 label 保持结构一致 -->
+          <label class="label" aria-hidden="true" style="visibility: hidden;">占位</label>
+          <div class="control">
+            <button 
+                class="button is-primary" 
+                type="submit" 
+                style="margin-top: 0.375em;"
+                onclick="return confirmSubmit()" 
+            >
+                发布文章
+            </button>
+          </div>
+        </div>
+      </div>         
+    <div class="field">
+        <label class="label">简介</label>
+        <div class="control">
+            <input class="input" type="text" name="intro" placeholder="文章简介"></input>
+        </div>
+    </div>
+    <!-- 在 "简介" 字段下方添加分类选择 -->
+    <div class="field">
+        <label class="label">分类</label>
+        <div class="control">
+            <div class="select is-fullwidth">
+                <select name="category">
+                    <option value="">-- 请选择分类 --</option>
+                    {% for category in categories %}  <!-- 从上下文获取分类列表 -->
+                        <option value="{{ category.id }}">{{ category.title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>  
+    <input type="hidden" name="status" id="id_status" value="draft">  <!-- 默认草稿 -->
+    <div class="columns">
+        <div class="column is-6">
+            <div class="field">
+                <label class="label">正文</label>
+                
+                <textarea 
+                    class="textarea elegant-border" 
+                    id="markdown-input" 
+                    name="body" 
+                    placeholder="文章正文"
+                    style="min-height: 500px;">
+                </textarea>
+            </div>
+        </div>
+        <div class="column is-6">
+            <h1 class="title">实时预览</h1>
+            <div id="markdown-preview" class="content is-medium"></div>
+        </div>
+    </div>
+    </form>
+</section>
+
+<script>
+
+    function confirmSubmit() {
+        const isPublish = confirm('是否立即发布文章？');
+        // 根据用户选择设置隐藏字段的值
+        document.getElementById('id_status').value = isPublish ? "active" : "draft";
+        return true; // 继续提交表单
+    }
+
+    const input = document.getElementById('markdown-input');
+    const preview = document.getElementById('markdown-preview');
+
+    input.addEventListener('input', function () {
+        const md = new window.markdownit();
+        const html = md.render(input.value);
+        preview.innerHTML = html;
+    });
+</script>
+{% endblock %}

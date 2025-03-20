@@ -6,23 +6,61 @@
     <section class="hero">
         <div class="hero-body">
             <div class="container">
+                <section class="section pt-0">
+                    <div class="columns is-multiline is-centered">
+                        <div class="column is-10">
+                            <div class="box p-4">
+                                <h3 class="title is-5 has-text-centered mb-4">所有分类</h3>
+                                <div class="tags are-medium is-flex is-flex-wrap-wrap is-justify-content-center">
+                                    {% for category in categorys %}
+                                        <a 
+                                            href="{% url 'category_detail' category.slug %}" 
+                                            class="tag is-primary is-light is-rounded mx-1 my-1"
+                                            style="transition: all 0.3s ease;"
+                                            onmouseover="this.style.transform='scale(1.05)'"
+                                            onmouseout="this.style.transform='scale(1)'"
+                                        >
+                                            {{ category.title }}
+                                            <span class="ml-2 has-text-weight-normal">
+                                                ({{ category.posts.count }})
+                                            </span>
+                                        </a>
+                                    {% empty %}
+                                        <p class="has-text-grey">暂无分类</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
                 <section class="section">
                     <div class="columns">
                         <div class="column is-8 is-offset-2">
                             {% for post in posts %}
-                                <div class="content is-medium">
+                                <div class="content is-medium box">  <!-- 添加 box 样式容器 -->
                                     <a href="{% url 'post_detail' post.category.slug post.slug %}">
-
                                         {% if post.image %}
                                             <figure class="image">
                                                 <img src="{{ post.image.url }}">
                                             </figure>
                                         {% endif %}
 
-                                        <h2 class="subtitle is-4">{{ post.created_time|timesince }} ago</h2>
-                                        <h1 class="title">{{ post.title }}</h1>
-                                        <p>{{ post.intro }}</p>
-                                        
+                                        <div class="mb-4">  <!-- 信息容器 -->
+                                            <!-- 添加类别标签 -->
+                                            <a 
+                                                href="{% url 'category_detail' post.category.slug %}" 
+                                                class="tag is-primary is-rounded mb-2"
+                                            >
+                                                {{ post.category.title }}
+                                            </a>
+                                            
+                                            <h2 class="subtitle is-6 has-text-grey">
+                                                {{ post.created_time|timesince }} ago
+                                            </h2>
+                                            <h1 class="title is-4">{{ post.title }}</h1>
+                                            <p class="has-text-grey-dark">{{ post.intro }}</p>
+                                        </div>
                                     </a>
                                 </div>
                             {% endfor %}

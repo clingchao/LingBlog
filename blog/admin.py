@@ -1,5 +1,4 @@
 from django.contrib import admin
-
 from .models import Post, Category, Comment
 
 class CommentItemInline(admin.TabularInline):
@@ -11,16 +10,14 @@ class PostAdmin(admin.ModelAdmin):
     list_display = ['title', 'slug', 'category', 'created_time','status']
     list_filter = ['category', 'created_time']
     inlines = [CommentItemInline]
-    prepopulated_fields = {'slug': ('title',)}
 
 class CategoryAdmin(admin.ModelAdmin):
     search_fields = ['title']
     list_display = ['title']
-    prepopulated_fields = {'slug': ('title',)}
 
 class CommentAdmin(admin.ModelAdmin):
     list_display = ['name', 'post', 'created_time']
 
 admin.site.register(Post, PostAdmin)
 admin.site.register(Category, CategoryAdmin)
-admin.site.register(Comment, CommentAdmin)   
+admin.site.register(Comment, CommentAdmin)
